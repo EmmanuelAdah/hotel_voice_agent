@@ -1,0 +1,128 @@
+groups:
+  - name: hotel_voice_agent_alerts
+    interval: 30s
+    rules:
+      # High error rate
+      - alert: HighAPIErrorRate
+        expr: |
+          rate(django_http_responses_total_by_status_view_method_total{status=~"5.."}[5m]) /
+          rate(django_http_responses_total_by_status_view_method_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High API error rate ({{ $value | humanizePercentage }})"
+          description: "More than 5% of requests are returning 5xx errors."
+
+      # Slow response times
+      - alert: SlowAPIResponses
+        expr: |
+          histogram_quantile(0.95, rate(hotel_api_request_duration_seconds_bucket[5m])) > 2.0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow API responses (p95={{ $value }}s)"
+
+      # Voice turn latency
+      - alert: HighVoiceTurnLatency
+        expr: |
+          histogram_quantile(0.95, rate(hotel_voice_turn_latency_seconds_bucket[5m])) > 5.0
+        for: 3m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High voice turn latency (p95={{ $value }}s)"
+
+      # OpenAI errors
+      - alert: OpenAIErrors
+        expr: rate(hotel_openai_errors_total[5m]) > 0.1
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "OpenAI API errors detected ({{ $value }}/s)"
+
+      # Kafka consumer lag
+      - alert: KafkaConsumerLag
+        expr: hotel_kafka_consumer_lag > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Kafka consumer lag is high ({{ $value }})"
+          description: "Topic={{ $labels.topic }}, Partition={{ $labels.partition }}"
+
+      # Database connection pool
+      - alert: DatabaseConnectionsHigh
+        expr: hotel_db_connection_pool_size > 180
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "DB connection pool near limit ({{ $value }})"
+
+      # Redis memory usage
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Redis memory usage is high ({{ $value | humanizePercentage }})"
+
+      # Celery queue depth
+      - alert: CeleryQueueDepth
+        expr: celery_queue_length > 500
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Celery queue depth is high ({{ $value }})"
+
+      # DLQ messages
+      - alert: KafkaDLQMessages
+        expr: increase(hotel_kafka_dlq_messages_total[10m]) > 5
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Messages going to DLQ ({{ $value }} in 10m)"
+
+      # Active sessions spike
+      - alert: VoiceSessionsSpike
+        expr: hotel_active_voice_sessions > 100
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of active voice sessions ({{ $value }})"
+
+  - name: infrastructure_alerts
+    rules:
+      # PostgreSQL down
+      - alert: PostgreSQLDown
+        expr: pg_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL is down"
+
+      # Redis down
+      - alert: RedisDown
+        expr: redis_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Redis is down"
+
+      # Kafka broker down
+      - alert: KafkaBrokerDown
+        expr: kafka_brokers < 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka broker is down"

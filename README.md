@@ -80,17 +80,17 @@ A **production-ready AI Voice Agent** for hotel services, built with Django, Ope
 
 ### 1 — Clone & configure
 ```bash
-git clone https://github.com/EmmanuelAdah/hotel_voice_agent.git
-cd hotel_voice_agent
-cp .env.example .env
-# Edit .env — set DJANGO_SECRET_KEY, DB_PASSWORD, OPENAI_API_KEY at minimum
+git clone https://github.com/your-org/hotel-voice-agent.git
+cd hotel-voice-agent
+cp .env.example.example .env.example
+# Edit .env.example — set DJANGO_SECRET_KEY, DB_PASSWORD, OPENAI_API_KEY at minimum
 ```
 
 ### 2 — Start with Docker Compose
 ```bash
 docker compose up -d
 ```
-First start takes ~2 minutes. Run migrations and seed demo data:
+The first start takes ~2 minutes. Run migrations and seed demo data:
 ```bash
 docker compose exec web python manage.py migrate
 docker compose exec web python manage.py seed_demo_data
