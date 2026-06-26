@@ -80,8 +80,8 @@ A **production-ready AI Voice Agent** for hotel services, built with Django, Ope
 
 ### 1 — Clone & configure
 ```bash
-git clone https://github.com/your-org/hotel-voice-agent.git
-cd hotel-voice-agent
+git clone https://github.com/EmmanuelAdah/hotel_voice_agent.git
+cd hotel_voice_agent
 cp .env.example .env
 # Edit .env — set DJANGO_SECRET_KEY, DB_PASSWORD, OPENAI_API_KEY at minimum
 ```
