@@ -1,0 +1,62 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+  external_labels:
+    environment: production
+    service: hotel-voice-agent
+
+# Alerting
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Load alerting rules
+rule_files:
+  - "rules/*.yml"
+
+scrape_configs:
+  # Django application metrics
+  - job_name: django
+    static_configs:
+      - targets: ["web:8000"]
+    metrics_path: /metrics/
+    scheme: http
+    scrape_interval: 15s
+
+  # Celery worker metrics (via Django app)
+  - job_name: celery
+    static_configs:
+      - targets: ["celery_worker:8000"]
+    metrics_path: /metrics/
+    scrape_interval: 30s
+
+  # PostgreSQL
+  - job_name: postgres
+    static_configs:
+      - targets: ["postgres_exporter:9187"]
+    scrape_interval: 30s
+
+  # Redis
+  - job_name: redis
+    static_configs:
+      - targets: ["redis_exporter:9121"]
+    scrape_interval: 15s
+
+  # Kafka
+  - job_name: kafka
+    static_configs:
+      - targets: ["kafka_exporter:9308"]
+    scrape_interval: 30s
+
+  # Nginx (if using nginx-prometheus-exporter)
+  - job_name: nginx
+    static_configs:
+      - targets: ["nginx:9113"]
+    scrape_interval: 15s
+
+  # Prometheus self-monitoring
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
