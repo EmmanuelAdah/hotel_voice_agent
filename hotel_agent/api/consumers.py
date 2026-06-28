@@ -10,7 +10,6 @@ from channels.db import database_sync_to_async
 from django.contrib.auth.models import AnonymousUser
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
-
 from hotel_agent.services.voice_agent import HotelVoiceAgentService, ConversationMessage
 from hotel_agent.monitoring.metrics import ACTIVE_VOICE_SESSIONS
 

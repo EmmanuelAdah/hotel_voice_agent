@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     # Django & REST
-    "django>=5.0.0 ,
+    "django>=5.0.0",
     "djangorestframework>=3.15.0",
     "djangorestframework-simplejwt>=5.3.0",
     "django-cors-headers>=4.3.0",
@@ -84,6 +84,7 @@ dev-dependencies = [
     "ruff>=0.4.0",
     "mypy>=1.10.0",
     "django-stubs>=5.0.0",
+    "django-debug-toolbar>=7.0.0",
 ]
 
 [tool.ruff]

@@ -171,7 +171,7 @@ class Booking(UUIDModel):
         ]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(check_out__gt=models.F("check_in")),
+                condition=models.Q(check_out__gt=models.F("check_in")),
                 name="check_out_after_check_in",
             )
         ]

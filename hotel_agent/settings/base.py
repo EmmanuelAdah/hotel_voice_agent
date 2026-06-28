@@ -61,6 +61,7 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "hotel_agent.core.middleware.RequestLoggingMiddleware",
@@ -174,13 +175,25 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_CLASSES": [
         "hotel_agent.api.throttling.BurstRateThrottle",
         "hotel_agent.api.throttling.SustainedRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
         "burst": "60/min",
         "sustained": "1000/hour",
+
         "voice_agent": "10/min",
+        "voice_session": "30/min",
+        "voice_chat": "100/hour",
+
         "anon": "20/hour",
+        "login": "5/min",
+        "register": "3/hour",
+
+        "booking": "10/min",
+
+        "upload_audio": "30/min",
     },
+
     "EXCEPTION_HANDLER": "hotel_agent.api.exceptions.custom_exception_handler",
 }
 
@@ -252,8 +265,11 @@ AWS_ACCESS_KEY_ID = config("AWS_ACCESS_KEY_ID", default="")
 AWS_SECRET_ACCESS_KEY = config("AWS_SECRET_ACCESS_KEY", default="")
 AWS_STORAGE_BUCKET_NAME = config("AWS_STORAGE_BUCKET_NAME", default="hotel-agent-media")
 AWS_S3_REGION_NAME = config("AWS_S3_REGION_NAME", default="us-east-1")
+AWS_S3_ENDPOINT_URL = config("AWS_S3_ENDPOINT_URL")
+
 AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL = "private"
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = True
 
 # ── Static & Media ────────────────────────────────────────────────────────────
 STATIC_URL = "/static/"
@@ -263,6 +279,11 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # ── Logging ───────────────────────────────────────────────────────────────────
+LOG_DIR = BASE_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+LOG_FILE = LOG_DIR / "app.log"
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -280,7 +301,7 @@ LOGGING = {
         "console": {"class": "logging.StreamHandler", "formatter": "console"},
         "json_file": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": "/var/log/hotel-agent/app.log",
+            "filename": LOG_FILE,
             "maxBytes": 10 * 1024 * 1024,  # 10MB
             "backupCount": 5,
             "formatter": "json",
