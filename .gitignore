@@ -24,8 +24,6 @@ staticfiles/
 media/
 
 # Docker
-*.env
-*.env.example
 
 # IDE
 .idea/
@@ -49,3 +47,5 @@ Thumbs.db
 *.key
 *.crt
 *.p12
+.env
+*.env
